@@ -82,6 +82,6 @@ def get_db() -> mysql.connector.connection.MySQLConnection:
             host=host,
             database=db_name
         )
-        return connection
+        return connection if connection.is_connected() else None
     except mysql.connector.Error as err:
         print("Error:", err)

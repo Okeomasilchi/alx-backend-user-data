@@ -6,16 +6,14 @@ Model for Logging
 
 
 import re
+from typing import List
 
 
-def check(fie: list, red: str, mess: str, sep: str) -> str:
-    """Handles obfuscation of log message"""
-    pattern = r"(" + "|".join(fie) + r")=.*?(?=" + \
-        re.escape(sep) + r"|$)"
-    return re.sub(pattern, r"\1=" + red, mess)
 
-
-def filter_datum(fields: list, redaction: str,
-                 message: str, separator: str) -> str:
-    """returns the log message obfuscated"""
-    return check(fields, redaction, message, separator)
+def filter_datum(fields: List[str], redaction: str, message: str,
+                 separator: str) -> str:
+    """Returns the log message obfuscated"""
+    for field in fields:
+        message = re.sub(f"{field}=[^{separator}]*",
+                         f"{field}={redaction}", message)
+    return message

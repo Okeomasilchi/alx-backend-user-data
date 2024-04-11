@@ -19,6 +19,9 @@ def filter_datum(fields: List[str], redaction: str, message: str,
     return message
 
 
+PII_FIELDS = ('name', 'email', 'phone', 'password', 'ssn')
+
+
 class RedactingFormatter(logging.Formatter):
     """
     Redacting Formatter class
@@ -36,3 +39,25 @@ class RedactingFormatter(logging.Formatter):
         """Formats the log record and applies data filtering"""
         return filter_datum(self.fields, self.REDACTION,
                             super().format(record), self.SEPARATOR)
+
+
+def get_logger() -> logging.Logger:
+    """
+    Returns a logger object configured to log user
+    data with redacted PII fields.
+
+    Returns:
+      logger (logging.Logger): The configured logger object.
+    """
+    logger = logging.getLogger("user_data")
+    logger.setLevel(logging.INFO)
+
+    formatter = RedactingFormatter(PII_FIELDS)
+
+    handler = logging.StreamHandler()
+    handler.setFormatter(formatter)
+
+    logger.addHandler(handler)
+    logger.propagate = False
+
+    return logger

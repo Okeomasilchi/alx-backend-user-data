@@ -10,6 +10,7 @@ import logging
 from typing import List
 import os
 import mysql.connector
+from mysql.connector.connection import MySQLConnection
 
 
 def filter_datum(fields: List[str], redaction: str, message: str,
@@ -65,7 +66,7 @@ def get_logger() -> logging.Logger:
     return logger
 
 
-def get_db() -> mysql.connector.connection.MySQLConnection:
+def get_db() -> MySQLConnection:
     """
     Retrieve database credentials from
     environment variables

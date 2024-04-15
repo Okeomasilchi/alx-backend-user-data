@@ -14,6 +14,26 @@ class BasicAuth(Auth):
         self,
         authorization_header: str
     ) -> str:
+        """
+        Extract the Base64 encoded part of a
+        Basic Authorization header.
+
+        Args:
+          authorization_header (str): The authorization
+              header from which the Base64 encoded string
+              is to be extracted.
+
+        Returns:
+          str: The Base64 encoded string if the header is
+              valid and contains the
+              expected prefix. Otherwise, None.
+
+        Note:
+            This function only validates the prefix and
+            the presence of the header. It does not validate
+            whether the Base64 string is properly encoded or
+            decode the Base64 string.
+        """
         if authorization_header is None or not isinstance(
             authorization_header,
             str

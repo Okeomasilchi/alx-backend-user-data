@@ -125,6 +125,8 @@ class Base():
     def search(cls, attributes: dict = {}) -> List[TypeVar('Base')]:
         """ Search all objects with matching attributes
         """
+        if not path.exists(".db_User.json"):
+            return False
         s_class = cls.__name__
         def _search(obj):
             if len(attributes) == 0:

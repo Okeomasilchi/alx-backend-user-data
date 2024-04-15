@@ -95,14 +95,17 @@ class BasicAuth(Auth):
               if successful, otherwise (None, None).
         """
         if (decoded_base64_authorization_header is None or
-            not isinstance(decoded_base64_authorization_header, str) or
-                ':' not in decoded_base64_authorization_header):
+                not isinstance(decoded_base64_authorization_header, str)):
             return None, None
 
-        credentials = decoded_base64_authorization_header.split(':')
-        if len(credentials) == 2:
-            return credentials[0], credentials[1]
-        return None, None
+        first_colon_index = decoded_base64_authorization_header.find(':')
+        if first_colon_index == -1:
+            return None, None
+
+        user_email = decoded_base64_authorization_header[:first_colon_index]
+        user_pwd = decoded_base64_authorization_header[first_colon_index + 1:]
+
+        return user_email, user_pwd
 
     def user_object_from_credentials(
         self,

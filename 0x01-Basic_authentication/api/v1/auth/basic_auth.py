@@ -8,6 +8,7 @@ from api.v1.auth.auth import Auth
 from typing import TypeVar
 import base64
 from models.user import User
+import os
 
 
 class BasicAuth(Auth):
@@ -123,7 +124,8 @@ class BasicAuth(Auth):
             return None
         if user_pwd is None or not isinstance(user_pwd, str):
             return None
-
+        if not os.path.exists(".db_User.json"):
+            return None
         users = User.search({'email': user_email})
         if not users:
             return None

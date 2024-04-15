@@ -5,6 +5,7 @@ class to manage the API authentication.
 
 
 from api.v1.auth.auth import Auth
+import base64
 
 
 class BasicAuth(Auth):
@@ -42,3 +43,33 @@ class BasicAuth(Auth):
         if not authorization_header.startswith('Basic '):
             return None
         return authorization_header.split(' ')[1]
+
+    def decode_base64_authorization_header(
+        self,
+        base64_authorization_header: str
+    ) -> str:
+        """
+        Decode a Base64 encoded authorization header
+        into a UTF-8 string.
+
+        Args:
+            base64_authorization_header (str):
+              The Base64 encoded string to decode.
+
+        Returns:
+            str: The decoded UTF-8 string if successful,
+              otherwise None.
+        """
+        if base64_authorization_header is None or not isinstance(
+            base64_authorization_header,
+            str
+        ):
+            return None
+
+        try:
+            base64_bytes = base64.b64decode(
+                base64_authorization_header
+            )
+            return base64_bytes.decode('utf-8')
+        except (base64.binascii.Error, ValueError):
+            return None

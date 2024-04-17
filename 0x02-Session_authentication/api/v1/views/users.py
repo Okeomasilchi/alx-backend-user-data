@@ -127,7 +127,8 @@ def update_user(user_id: str = None) -> str:
 
 @app_views.route('/users/me', methods=['GET'], strict_slashes=False)
 def get_authenticated_User() -> str:
-    """ GET /api/v1/users/me
+    """
+    GET /api/v1/users/me
     Return:
       - Authenticated User object JSON represented
       - 404 if no authenticated user

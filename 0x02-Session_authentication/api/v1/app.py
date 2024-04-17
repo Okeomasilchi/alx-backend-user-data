@@ -25,6 +25,7 @@ elif os.environ.get('AUTH_TYPE') == 'session_auth':
     from api.v1.auth.session_auth import SessionAuth
     auth = SessionAuth()
 
+
 @app.before_request
 def handle_before_request():
     """
@@ -46,10 +47,15 @@ def handle_before_request():
         [
             '/api/v1/status/',
             '/api/v1/unauthorized/',
-            '/api/v1/forbidden/'
+            '/api/v1/forbidden/',
+            '/api/v1/auth_session/login/'
         ]
     ):
         return
+
+    if auth.authorization_header(request) and \
+            auth.session_cookie(request):
+        return None, abort(401)
 
     if auth.authorization_header(request) is None:
         abort(401)

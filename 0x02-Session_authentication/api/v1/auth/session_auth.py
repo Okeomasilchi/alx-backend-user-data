@@ -10,6 +10,7 @@ import base64
 from models.user import User
 import uuid
 import os
+from models.user import User
 
 
 class SessionAuth(Auth):
@@ -40,3 +41,19 @@ class SessionAuth(Auth):
             return None
 
         return SessionAuth.user_id_by_session_id.get(session_id, None)
+
+    def current_user(self, request=None):
+            """
+            Retrieves the currently authenticated user.
+
+            Args:
+                request (Request): The request object (optional).
+
+            Returns:
+                User: The currently authenticated user.
+
+            """
+            cookie = self.session_cookie(request)
+            user_id = self.user_id_for_session_id(cookie)
+            user = User.get(user_id)
+            return user

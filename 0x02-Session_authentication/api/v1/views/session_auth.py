@@ -52,5 +52,14 @@ def login():
     strict_slashes=False
 )
 def logout():
+    """
+    Log out the user by destroying the session.
+
+    Returns:
+        A tuple containing an empty JSON response
+        and a status code of 200 if the session is
+        successfully destroyed. Otherwise, it aborts
+        with a status code of 404.
+    """
     from api.v1.app import auth
     return jsonify({}), 200 if auth.destroy_session(request) else abort(404)

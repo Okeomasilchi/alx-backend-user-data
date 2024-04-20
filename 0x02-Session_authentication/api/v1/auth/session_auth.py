@@ -5,11 +5,8 @@ class to manage the API authentication.
 
 
 from api.v1.auth.auth import Auth
-from typing import TypeVar
-import base64
 from models.user import User
 import uuid
-import os
 from models.user import User
 
 
@@ -23,7 +20,6 @@ class SessionAuth(Auth):
             return None
         session_id = str(uuid.uuid4())
         SessionAuth.user_id_by_session_id[session_id] = user_id
-        # print(SessionAuth.user_id_by_session_id)
         return session_id
 
     def user_id_for_session_id(self, session_id: str = None) -> str:

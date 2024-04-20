@@ -60,8 +60,8 @@ def handle_before_request():
     if auth.current_user(request) is None:
         abort(403)
 
-    if auth.authorization_header(request) is None:
-        abort(401)
+    # if auth.authorization_header(request) is None:
+    #     abort(401)
 
     request.current_user = auth.current_user(request)
 

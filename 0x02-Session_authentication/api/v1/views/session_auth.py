@@ -62,4 +62,6 @@ def logout():
         with a status code of 404.
     """
     from api.v1.app import auth
-    return jsonify({}), 200 if auth.destroy_session(request) else abort(404)
+    if not auth.destroy_session(request):
+        abort(404)
+    return jsonify({}), 200

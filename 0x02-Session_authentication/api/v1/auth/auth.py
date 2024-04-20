@@ -59,4 +59,4 @@ class Auth:
             return None
 
         session = os.environ.get("SESSION_NAME")
-        return request.cookies.get(session)
+        return request.cookies.get(session, None)

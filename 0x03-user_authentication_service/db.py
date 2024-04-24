@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
-
+"""DB module.
 """
-DB module
-"""
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, tuple_
+from sqlalchemy.exc import InvalidRequestError
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.exc import IntegrityError, InvalidRequestError
-from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm.session import Session
-from user import User
-from user import Base
+
+from user import Base, User
 
 
 class DB:
@@ -56,15 +54,14 @@ class DB:
             return
         if hashed_password is None:
             return
-        user = User(email=email, hashed_password=hashed_password)
         try:
+            user = User(email=email, hashed_password=hashed_password)
             self._session.add(user)
             self._session.commit()
-        except IntegrityError as e:
+        except Exception as e:
             self._session.rollback()
-            raise ValueError("User with this email already exists")
-        else:
-            return user
+            user = None
+        return user
 
     def find_user_by(self, **kwargs) -> User:
         """
@@ -83,11 +80,16 @@ class DB:
           NoResultFound: If no user is found that matches
           the given criteria.
         """
-        all_users = self._session.query(User)
-        for k, v in kwargs.items():
-            if k not in User.__dict__:
-                raise InvalidRequestError
-            for u in all_users:
-                if getattr(u, k) == v:
-                    return u
-                raise NoResultFound
+        fields, values = [], []
+        for key, value in kwargs.items():
+            if hasattr(User, key):
+                fields.append(getattr(User, key))
+                values.append(value)
+            else:
+                raise InvalidRequestError()
+        result = self._session.query(User).filter(
+            tuple_(*fields).in_([tuple(values)])
+        ).first()
+        if result is None:
+            raise NoResultFound()
+        return result

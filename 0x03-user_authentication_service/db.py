@@ -33,8 +33,8 @@ class DB:
             self.__session = DBSession()
         return self.__session
 
-    def add_user(self, email: str = None,
-                 hashed_password: str = None) -> object:
+    def add_user(self, email: str,
+                 hashed_password: str) -> User:
         """
         Adds a new user to the database.
 
@@ -52,9 +52,9 @@ class DB:
             exists in the database.
         """
         if email is None:
-            raise ValueError("Email is required")
+            return
         if hashed_password is None:
-            raise ValueError("hashed_password is required")
+            return
         user = User(email=email, hashed_password=hashed_password)
         try:
             session  = self._session

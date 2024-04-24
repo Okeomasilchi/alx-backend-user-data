@@ -66,7 +66,7 @@ class DB:
         else:
             return user
 
-    def find_user_by(self, **kwargs):
+    def find_user_by(self, **kwargs) -> User:
         """
         Find a user in the database based on the given
         criteria.
@@ -85,8 +85,10 @@ class DB:
         """
         try:
             user = self._session.query(User).filter_by(**kwargs).first()
-            if user is None:
+            if not user:
                 raise NoResultFound()
             return user
+        except NoResultFound:
+            raise NoResultFound("Not found")
         except InvalidRequestError:
-            raise InvalidRequestError()
+            raise InvalidRequestError("Invalid")

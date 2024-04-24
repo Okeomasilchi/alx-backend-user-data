@@ -57,8 +57,9 @@ class DB:
             raise ValueError("hashed_password is required")
         user = User(email=email, hashed_password=hashed_password)
         try:
-            self._session.add(user)
-            self._session.commit()
+            session  = self._session
+            session.add(user)
+            session.commit()
         except IntegrityError as e:
             self._session.rollback()
             raise ValueError("User with this email already exists")

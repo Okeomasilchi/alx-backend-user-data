@@ -83,10 +83,7 @@ class DB:
           NoResultFound: If no user is found that matches
           the given criteria.
         """
-        try:
-            user = self._session.query(User).filter_by(**kwargs).first()
-            return user
-        except NoResultFound:
-            raise NoResultFound("Not found")
-        except InvalidRequestError:
-            raise InvalidRequestError("Invalid")
+        user = self._session.query(User).filter_by(**kwargs).first()
+        if not user:
+            raise NoResultFound
+        return user

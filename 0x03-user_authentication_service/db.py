@@ -57,7 +57,7 @@ class DB:
             return
         user = User(email=email, hashed_password=hashed_password)
         try:
-            session  = self._session
+            session = self._session
             session.add(user)
             session.commit()
         except IntegrityError as e:

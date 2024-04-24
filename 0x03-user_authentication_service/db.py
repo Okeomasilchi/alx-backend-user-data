@@ -11,7 +11,7 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 from user import User
 from user import Base
-
+from typing import Any
 
 class DB:
     """DB class
@@ -66,7 +66,7 @@ class DB:
         else:
             return user
 
-    def find_user_by(self, **kwargs) -> User:
+    def find_user_by(self, **kwargs: dict[str, Any]) -> User:
         """
         Find a user in the database based on the given
         criteria.

@@ -58,11 +58,7 @@ class DB:
         if not isinstance([email, hashed_password], str):
             return
         user = User(email=email, hashed_password=hashed_password)
-        try:
-            session = self._session
-            session.add(user)
-            session.commit()
-        except IntegrityError as e:
-            self._session.rollback()
-            raise ValueError("User with this email already exists")
+        session = self._session
+        session.add(user)
+        session.commit()
         return user

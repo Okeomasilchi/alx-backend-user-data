@@ -5,7 +5,8 @@ DB module
 """
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, InvalidRequestError
+from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
 from user import User
@@ -64,3 +65,25 @@ class DB:
             raise ValueError("User with this email already exists")
         else:
             return user
+
+    def find_user_by(self, **kwargs):
+        """
+        Find a user in the database based on the given
+        criteria.
+
+        Args:
+          **kwargs: Keyword arguments representing the criteria
+                    to search for. The keys should correspond to
+                    the column names in the User table.
+
+        Returns:
+          The first user that matches the given criteria.
+
+        Raises:
+          NoResultFound: If no user is found that matches
+          the given criteria.
+        """
+        user = self._session.query(User).filter_by(**kwargs).first()
+        if user is None:
+            raise NoResultFound()
+        return user

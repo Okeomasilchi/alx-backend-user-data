@@ -51,14 +51,16 @@ class DB:
           ValueError: If a user with the same email already
             exists in the database.
         """
-        # if email is None:
-        #     return
-        # if hashed_password is None:
-        #     return
-        # if not isinstance([email, hashed_password], str):
-        #     return
+        if email is None:
+            return
+        if hashed_password is None:
+            return
         user = User(email=email, hashed_password=hashed_password)
-        session = self._session
-        session.add(user)
-        session.commit()
-        return user
+        try:
+            self._session.add(user)
+            self._session.commit()
+        except IntegrityError as e:
+            self._session.rollback()
+            raise ValueError("User with this email already exists")
+        else:
+            return user

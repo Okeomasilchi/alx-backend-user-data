@@ -4,7 +4,7 @@ Basic Flask app
 """
 
 
-from flask import Flask, jsonify, request, abort, make_response
+from flask import Flask, jsonify, request, abort, make_response, redirect, url_for
 from auth import Auth
 
 app = Flask(__name__)
@@ -73,6 +73,41 @@ def login() -> make_response:
     response = make_response(jsonify(res_data), 200)
     response.set_cookie('session_id', session_id)
     return response
+
+
+@app.route("/sessions", methods=["DELETE"], strict_slashes=False)
+def logout() -> make_response:
+    """
+    Logs out a user by deleting the session cookie.
+
+    Returns:
+        A response object with a JSON payload containing a success message.
+
+    Raises:
+        HTTPException: If the session cookie is not set.
+    """
+    session_id = request.cookies.get("session_id")
+    try:
+        user = AUTH.get_user_from_session_id(session_id)
+        if not user:
+            abort(403)
+        AUTH.destroy_session(user.id)
+        return redirect(url_for("welcome"))
+    except:
+        abort(403)
+
+
+@app.route("/profile", methods=["GET"], strict_slashes=False)
+def profile() -> make_response:
+    """Rturens a JSON response with the user's email."""
+    session_id = request.cookies.get("session_id")
+    try:
+        user = AUTH.get_user_from_session_id(session_id)
+        if not user:
+            abort(403)
+        return jsonify({"email": user.email}), 200
+    except:
+        abort(403)
 
 
 if __name__ == "__main__":

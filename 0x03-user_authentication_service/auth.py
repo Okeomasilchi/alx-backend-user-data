@@ -10,8 +10,6 @@ from user import User
 from uuid import uuid4
 from typing import Union
 
-__all__ = ['Auth']
-
 
 def _generate_uuid() -> str:
     """
@@ -57,7 +55,7 @@ class Auth:
         """
         self._db = DB()
 
-    def register_user(self, email: str, password: str) -> None:
+    def register_user(self, email: str, password: str) -> User:
         """
         Registers a user in the database.
 
@@ -95,7 +93,7 @@ class Auth:
         except Exception:
             return False
 
-    def create_session(self, email: str) -> str:
+    def create_session(self, email: str) -> Union[str, None]:
         """
         Creates a session for the user with the given email.
 
@@ -137,3 +135,20 @@ class Auth:
             return None
         except Exception:
             return None
+
+    def destroy_session(self, user_id: int) -> None:
+        """
+        Destroys a session based on the user ID.
+
+        Args:
+            user_id (int): The user ID of the user.
+
+        Returns:
+            None
+        """
+        try:
+            user = self._db._session.query(User).filter_by(id=user_id).first()
+            user.session_id = None
+            self._db._session.commit()
+        except Exception:
+            pass

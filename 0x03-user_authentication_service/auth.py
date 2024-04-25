@@ -8,7 +8,7 @@ import bcrypt
 from db import DB
 from user import User
 from uuid import uuid4
-
+from typing import Union
 
 __all__ = ['Auth']
 
@@ -113,6 +113,27 @@ class Auth:
                 user.session_id = sess_id
                 self._db._session.commit()
                 return sess_id
+            return None
+        except Exception:
+            return None
+
+    def get_user_from_session_id(self, session_id: str) -> Union[dict, None]:
+        """
+        Retrieve a user from the database based on the
+        provided session ID.
+
+        Args:
+            session_id (str): The session ID of the user.
+
+        Returns:
+            Union[dict, None]: The user object if found,
+                                None otherwise.
+        """
+        try:
+            user = self._db._session.query(User).filter_by(
+                session_id=session_id).first()
+            if user.session_id:
+                return user
             return None
         except Exception:
             return None

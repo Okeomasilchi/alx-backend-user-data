@@ -7,6 +7,19 @@ Auth model for all authentication mechanisms
 import bcrypt
 from db import DB
 from user import User
+from uuid import uuid4
+
+
+def _generate_uuid() -> str:
+    """
+    Generates a string representation of a new UUID.
+
+    This function is private to the auth module.
+
+    Returns:
+        str: A string representation of a newly generated UUID.
+    """
+    return str(uuid4())
 
 
 def _hash_password(password: str) -> bytes:

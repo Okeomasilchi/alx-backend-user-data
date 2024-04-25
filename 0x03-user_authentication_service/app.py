@@ -13,20 +13,42 @@ AUTH = Auth()
 
 @app.route("/")
 def welcome():
-    return jsonify({"message": "Bienvenue"})
+  """
+  Returns a JSON response with a welcome message.
+
+  :return: JSON response with a welcome message.
+  """
+  return jsonify({"message": "Bienvenue"})
 
 
 @app.route("/users", methods=["POST"])
 def users():
-    email = request.form.get("email")
-    password = request.form.get("password")
+  """
+  Register a new user.
 
-    try:
-        new_user = AUTH.register_user(email, password)
-        return jsonify({"email": new_user.email,
-                        "message": "user created"}), 200
-    except ValueError:
-        return jsonify({"message": "email already registered"}), 400
+  This function handles the registration of a new user by
+  extracting the email and password from the request form.
+  It then calls the `register_user` method of the `AUTH`
+  object to register the user. If the registration is successful,
+  it returns a JSON response with the user's email and a success
+  message. If the email is already registered, it returns a JSON
+  response with an error message.
+
+  Returns:
+    A JSON response containing the user's email and a success
+    message if the registration is successful.
+    A JSON response with an error message if the email is already
+    registered.
+  """
+  email = request.form.get("email")
+  password = request.form.get("password")
+
+  try:
+    new_user = AUTH.register_user(email, password)
+    return jsonify({"email": new_user.email,
+            "message": "user created"}), 200
+  except ValueError:
+    return jsonify({"message": "email already registered"}), 400
 
 
 if __name__ == "__main__":

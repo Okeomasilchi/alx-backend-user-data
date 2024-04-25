@@ -17,7 +17,7 @@ def welcome():
 
 
 @app.route("/users", methods=["POST"])
-def register_user():
+def users():
     email = request.form.get("email")
     password = request.form.get("password")
 

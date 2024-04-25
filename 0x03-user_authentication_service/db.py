@@ -32,8 +32,7 @@ class DB:
             self.__session = DBSession()
         return self.__session
 
-    def add_user(self, email: str,
-                 hashed_password: str) -> User:
+    def add_user(self, email: str, hashed_password: str) -> User:
         """
         Adds a new user to the database.
 
@@ -57,8 +56,22 @@ class DB:
 
     def find_user_by(self, **kwargs) -> User:
         """
-        returns the first row found in the users
-        table as filtered
+        Find a user in the database based on the provided criteria.
+
+        Args:
+          **kwargs: Keyword arguments representing the criteria to
+                    search for. The keys should correspond to the
+                    column names in the User table.
+
+        Returns:
+          User: The user object that matches the provided criteria.
+
+        Raises:
+          NoResultFound: If no user is found that matches the
+                          provided criteria. InvalidRequestError:
+                          If the query is invalid or the database
+                          connection is not established.
+
         """
         try:
             user = self._session.query(User).filter_by(**kwargs).one()

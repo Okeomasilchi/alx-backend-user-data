@@ -71,7 +71,6 @@ class DB:
                           provided criteria. InvalidRequestError:
                           If the query is invalid or the database
                           connection is not established.
-
         """
         try:
             user = self._session.query(User).filter_by(**kwargs).one()
@@ -80,3 +79,27 @@ class DB:
         except InvalidRequestError:
             raise InvalidRequestError()
         return user
+
+    def update_user(self, user_id: int, **kwargs) -> None:
+        """
+        Update the attributes of a user with the given user_id.
+
+        Args:
+          user_id (int): The ID of the user to update.
+          **kwargs: Keyword arguments representing the attributes
+                    to update.
+
+        Raises:
+          ValueError: If any of the provided attributes do not exist
+                      in the user object.
+
+        Returns:
+          None
+        """
+        user = self.find_user_by(id=user_id)
+        if not all(attr in dir(user) for attr in kwargs):
+            raise ValueError
+        for k, v in kwargs.items():
+            setattr(user, k, v)
+        self._session.commit()
+        return None

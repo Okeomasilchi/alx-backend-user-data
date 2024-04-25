@@ -9,84 +9,88 @@ from db import DB
 from user import User
 from uuid import uuid4
 
-if __name__ == '__main__':
-    def _generate_uuid() -> str:
-        """
-        Generates a string representation of a new UUID.
 
-        This function is private to the auth module.
+__all__ = ['Auth']
+
+
+def _generate_uuid() -> str:
+    """
+    Generates a string representation of a new UUID.
+
+    This function is private to the auth module.
+
+    Returns:
+        str: A string representation of a newly generated UUID.
+    """
+    return str(uuid4())
+
+
+def _hash_password(password: str) -> bytes:
+    """
+        Hashes the given password using bcrypt.
+
+        Args:
+          password (str): The password to be hashed.
 
         Returns:
-            str: A string representation of a newly generated UUID.
+          bytes: The hashed password.
         """
-        return str(uuid4())
+    salt = bcrypt.gensalt()
+    return bcrypt.hashpw(
+        password.encode('utf-8'),
+        salt
+    )
 
-    def _hash_password(password: str) -> bytes:
+
+class Auth:
+    """
+    Auth class to interact with the authentication database.
+    """
+
+    def __init__(self):
         """
-            Hashes the given password using bcrypt.
+        Initializes an instance of the Auth class.
 
-            Args:
-            password (str): The password to be hashed.
-
-            Returns:
-            bytes: The hashed password.
-            """
-        salt = bcrypt.gensalt()
-        return bcrypt.hashpw(
-            password.encode('utf-8'),
-            salt
-        )
-
-    class Auth:
+        The __init__ method is called when a new object of the
+        Auth class is created. It initializes the instance
+        variable _db with an instance of the DB class.
         """
-        Auth class to interact with the authentication database.
+        self._db = DB()
+
+    def register_user(self, email: str, password: str) -> None:
         """
+        Registers a user in the database.
 
-        def __init__(self):
-            """
-            Initializes an instance of the Auth class.
+        Args:
+          email (str): The email address of the user.
+          password (str): The password of the user.
 
-            The __init__ method is called when a new object of the
-            Auth class is created. It initializes the instance
-            variable _db with an instance of the DB class.
-            """
-            self._db = DB()
+        Returns:
+          None
+        """
+        if self._db._session.query(User).filter_by(email=email).first():
+            raise ValueError(f"User '{email}' already exists")
 
-        def register_user(self, email: str, password: str) -> None:
-            """
-            Registers a user in the database.
+        return self._db.add_user(email, _hash_password(password))
 
-            Args:
-            email (str): The email address of the user.
-            password (str): The password of the user.
+    def valid_login(self, email: str, password: str) -> bool:
+        """
+        Validates a user's login credentials.
 
-            Returns:
-            None
-            """
-            if self._db._session.query(User).filter_by(email=email).first():
-                raise ValueError(f"User '{email}' already exists")
+        Args:
+        email (str): The email address of the user.
+        password (str): The password of the user.
 
-            return self._db.add_user(email, _hash_password(password))
-
-        def valid_login(self, email: str, password: str) -> bool:
-            """
-            Validates a user's login credentials.
-
-            Args:
-            email (str): The email address of the user.
-            password (str): The password of the user.
-
-            Returns:
-            bool: True if the login credentials are valid, False otherwise.
-            """
-            try:
-                user = self._db._session.query(
-                    User).filter_by(email=email).first()
-                if user:
-                    return bcrypt.checkpw(
-                        password.encode('utf-8'),
-                        user.hashed_password
-                    )
-                return False
-            except Exception:
-                return False
+        Returns:
+        bool: True if the login credentials are valid, False otherwise.
+        """
+        try:
+            user = self._db._session.query(User).filter_by(email=email).first()
+            if user:
+                return bcrypt.checkpw(
+                    password.encode('utf-8'),
+                    user.hashed_password
+                )
+            return False
+        except Exception:
+            return False

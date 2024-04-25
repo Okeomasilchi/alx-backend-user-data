@@ -4,7 +4,7 @@ Basic Flask app
 """
 
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, abort, make_response
 from auth import Auth
 
 app = Flask(__name__)
@@ -49,6 +49,30 @@ def users():
                         "message": "user created"}), 200
     except ValueError:
         return jsonify({"message": "email already registered"}), 400
+
+
+@app.route("/sessions", methods=["POST"], strict_slashes=False)
+def login() -> make_response:
+    """
+    Logs in a user by validating the provided email and password.
+
+    Returns:
+        A response object with a JSON payload containing the user's
+        email and a success message.
+
+    Raises:
+        HTTPException: If the provided email and password are invalid.
+    """
+    email = request.form.get("email")
+    password = request.form.get("password")
+    if not AUTH.valid_login(email, password):
+        abort(401)
+    session_id = AUTH.create_session(email)
+    res_data = {"email": email, "message": "logged in"}
+
+    response = make_response(jsonify(res_data), 200)
+    response.set_cookie('session_id', session_id)
+    return response
 
 
 if __name__ == "__main__":

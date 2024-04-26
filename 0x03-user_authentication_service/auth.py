@@ -152,3 +152,40 @@ class Auth:
             self._db._session.commit()
         except Exception:
             pass
+
+    def request_password_reset(self, email: str) -> str:
+        """
+        Generates a password reset token for the user with the given email.
+
+        Args:
+            email (str): The email of the user.
+
+        Returns:
+            str: The password reset token.
+        """
+        user = self._db._session.query(User).filter_by(email=email).first()
+        if user:
+            reset_token = _generate_uuid()
+            user.reset_token = reset_token
+            self._db._session.commit()
+            return reset_token
+        raise ValueError
+
+    def update_password(self, reset_token: str, password: str) -> None:
+        """
+        Updates the password of the user with the given reset token.
+
+        Args:
+            reset_token (str): The password reset token.
+            password (str): The new password.
+
+        Returns:
+            None
+        """
+        user = self._db._session.query(User).filter_by(reset_token=reset_token).first()
+        if user:
+            user.hashed_password = _hash_password(password)
+            user.reset_token = None
+            self._db._session.commit()
+            return None
+        raise ValueError
